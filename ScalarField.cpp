@@ -4,7 +4,9 @@ ScalarField.cpp : Implementation of the scalar field class.
 ----------------------------------------------------------------------
 */
 
+#include "FieldHelper.hpp"
 #include "ScalarField.hpp"
+#include "VectorField.hpp"
 
 #include <math.h>
 
@@ -103,7 +105,7 @@ void ScalarField::Advection(VectorField *u)
         Vec2 prevPos = curPos - vel * m_Dt;
 
         // clip the trajectory at the boundary if necessary.
-        prevPos = Field_Helper::clipped_pos(prevPos, curPos, vel, m_NumCells);
+        FieldHelper::ClipPos(prevPos, curPos, vel, m_NumCells);
 
         // set the scalar to the interpolated scalar at the earlier position
         newField[IX_DIM(i,j)] = Interpolate(prevPos);
@@ -147,7 +149,7 @@ void ScalarField::Advection(VectorField *u)
  * @param pos The position to get the value at.
  * @return The interpolated scalar value at the given position
  ******************************************************************************/
-double ScalarField::Interpolate(Vec2 pos)
+double ScalarField::Interpolate(const Vec2& pos)
 {
     // calculate the indices of the cells corresponding to the position
     int low_x = (int) (pos[0] + 0.5);

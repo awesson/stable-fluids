@@ -1,5 +1,8 @@
 #pragma once
-#include "VectorField.hpp"
+
+#include <gfx/vec2.h>
+
+class VectorField;
 
 /******************************************************************************
  * MAC grid representation of a scalar field. Values are defined at the center
@@ -16,7 +19,7 @@ public:
     void    TimeStep(ScalarField *a_SrcField, VectorField *VelocityField);
     void    AddField(ScalarField *a_SrcField);
     void    Advection(VectorField *u);
-    double  Interpolate(Vec2 pos);
+    double  Interpolate(const Vec2& pos);
 
     double  &operator[](int i) { return m_Field[i]; }
 

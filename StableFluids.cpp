@@ -5,6 +5,7 @@ StableFluids.cpp : Defines the entry point for the console application.
 */
 
 #include "ScalarField.hpp"
+#include "VectorField.hpp"
 #include "imageio.hpp"
 
 #include <stdlib.h>
@@ -41,11 +42,14 @@ static ScalarField *TemperatureField, *PrevTemperatureField;
 static int win_id;
 static int win_x, win_y;
 
-// variables for mouse interaction
+static int prev_fps_taken_time, fpsFrameNumber;
+static char fpsString[10];
+
+/* variables for mouse interaction */
 static int mouse_down[3];
 static int omx, omy, mx, my;
 
-bool red, green, blue;
+static bool red, green, blue;
 
 
 /*
@@ -112,6 +116,9 @@ static int allocate_data ( void )
         fprintf ( stderr, "cannot allocate data\n" );
         return ( 0 );
     }
+    
+    prev_fps_taken_time = 0;
+    fpsString[0] = '\0';
 
     // bool for which color fluid will be added
     red = false;
@@ -127,6 +134,77 @@ static int allocate_data ( void )
 OpenGL specific drawing routines
 -------------------------------------------------------------------------------
 */
+
+void setOrthographicProjection()
+{
+	// switch to projection mode
+	glMatrixMode(GL_PROJECTION);
+
+	// save previous matrix which contains the
+	//settings for the perspective projection
+	glPushMatrix();
+
+	// reset matrix
+	glLoadIdentity();
+
+	// set a 2D orthographic projection
+	gluOrtho2D(0, win_x, win_y, 0);
+
+	// switch back to modelview mode
+	glMatrixMode(GL_MODELVIEW);
+}
+
+void restorePerspectiveProjection()
+{
+	glMatrixMode(GL_PROJECTION);
+	// restore previous projection matrix
+	glPopMatrix();
+
+	// get back to modelview mode
+	glMatrixMode(GL_MODELVIEW);
+}
+
+void renderBitmapString(float x,
+		                float y,
+		                void *font,
+		                char *string)
+{
+	glRasterPos3f(x, y, 0.0f);
+	for (char *c = string; *c != '\0'; c++)
+	{
+		glutBitmapCharacter(font, *c);
+	}
+}
+
+static void renderQuad(float x, float y, float width, float height)
+{
+    glPushMatrix();
+    glTranslatef(x, y, 0.f);
+    
+    glBegin(GL_QUADS); // Start drawing a quad primitive  
+  
+    glVertex3f(-0.5f * width, -0.5f * height, 0.0f);
+    glVertex3f(-0.5f * width, 0.5f * height, 0.0f);
+    glVertex3f(0.5f * width, 0.5f * height, 0.0f);
+    glVertex3f(0.5f * width, -0.5f * height, 0.0f);
+  
+    glEnd();  
+    
+    glPopMatrix();
+}
+
+static void draw_fps()
+{
+    glPushMatrix();
+    glLoadIdentity();
+    setOrthographicProjection();
+    glColor3f(0.0f, 0.0f, 0.0f);
+    renderQuad(25, 6, 50, 12);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    renderBitmapString(5, 10,  GLUT_BITMAP_TIMES_ROMAN_10, fpsString);
+    glPopMatrix();
+    restorePerspectiveProjection();
+}
 
 static void pre_display ( void )
 {
@@ -158,6 +236,8 @@ static void post_display ( void )
         }
         frame_number++;
     }
+    
+    draw_fps ();
 
     glutSwapBuffers ();
 }
@@ -373,7 +453,7 @@ static void reshape_func ( int width, int height )
 }
 
 static void idle_func ( void )
-{
+{   
     // get user input
     get_from_UI( PrevDensityFieldRed, PrevDensityFieldGreen,
                  PrevDensityFieldBlue, PrevTemperatureField,
@@ -398,9 +478,20 @@ static void idle_func ( void )
 
     glutSetWindow ( win_id );
     glutPostRedisplay ();
+    
+    // calculate fps
+	int cur_time = glutGet(GLUT_ELAPSED_TIME);
+	if(cur_time - prev_fps_taken_time > 1000)
+	{
+		float fps = (1000.0f * fpsFrameNumber) / ((float)(cur_time - prev_fps_taken_time));
+		sprintf(fpsString, "FPS: %4.2f", fps);
+		prev_fps_taken_time = cur_time;
+		fpsFrameNumber = 0;
+	}
+	fpsFrameNumber++;
 }
 
-static void display_func ( void )
+static void display_func()
 {
     pre_display ();
 

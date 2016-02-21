@@ -4,6 +4,7 @@ VectorField.cpp : Implementation of the vector field class.
 -------------------------------------------------------------------------------
 */
 
+#include "FieldHelper.hpp"
 #include "VectorField.hpp"
 
 // macros for allocating memory for the field
@@ -28,18 +29,23 @@ VectorField.cpp : Implementation of the vector field class.
 /***********************************************************************
  * Standard constructor.
  *
- * @param a_NumCells The width and height of the grid in cells.
- * @param a_Viscosity The viscosity of the fluid. (currently not used)
- * @param a_Dt The time step of the simulation.
+ * @param numCells The width and height of the grid in cells.
+ * @param viscosity The viscosity of the fluid. (currently not used)
+ * @param dt The time step of the simulation.
  ***********************************************************************/
-VectorField::VectorField(int a_NumCells, double a_Viscosity, double a_Dt)
-: m_NumCells(a_NumCells),
-  m_Field(CREATE_DIM1),
-  m_Viscosity(a_Viscosity),
-  m_Dt(a_Dt)
+VectorField::VectorField(int numCells, double viscosity, double dt)
+    : m_NumCells(numCells)
+    , m_Viscosity(viscosity)
+    , m_Dt(dt)
 {
-    for(int i = 0; i < (m_NumCells+2); i++){
-        for(int j = 0; j < (m_NumCells+2); j++){
+    int gridDimention = numCells + 2;
+    int gridSize = gridDimention*gridDimention;
+    m_Field = new Vec2[gridSize];
+    
+    for(int i = 0; i < (m_NumCells + 2); i++)
+    {
+        for(int j = 0; j < (m_NumCells + 2); j++)
+        {
             m_Field[IX_DIM(i,j)][0] = m_Field[IX_DIM(i,j)][1] = 0;
         }
     }
@@ -141,7 +147,7 @@ void VectorField::Advection(VectorField *oldField)
         prevPos = curPos - vel * m_Dt;
 
         // apply clipping at boundary if necessary
-        prevPos = Field_Helper::clipped_pos(prevPos, curPos, vel, m_NumCells);
+        FieldHelper::ClipPos(prevPos, curPos, vel, m_NumCells);
 
         // find the new grid centered velocities based on the previous position
         new_u[IX_DIM(i,j)] = oldField->Interpolate(prevPos);
