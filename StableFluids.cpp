@@ -546,7 +546,7 @@ int main ( int argc, char ** argv )
         fprintf ( stderr, "\t visc   : viscosity of the fluid\n" );
         fprintf ( stderr, "\t force  : scales the mouse movement that generate a force\n" );
         fprintf ( stderr, "\t source : amount of density that will be deposited\n" );
-        fprintf ( stderr, "\t fluid : the temperature of the fluid\n" );
+        fprintf ( stderr, "\t temp : the temperature of the fluid\n" );
         exit ( 1 );
     }
 
@@ -558,8 +558,8 @@ int main ( int argc, char ** argv )
         force = 1;
         source = 10;
         temp = 5;
-        fprintf ( stderr, "Using defaults : N=%d dt=%g diff=%g visc=%f force=%f source=%f temp=%f\n",
-                  N, dt, diff, visc, force, source );
+        fprintf (stderr, "Using defaults : N=%d dt=%g diff=%g visc=%g force=%g source=%g temp=%g\n",
+                 N, dt, diff, visc, force, source, temp);
     } else {
         N = atoi(argv[1]);
         dt = atof(argv[2]);
