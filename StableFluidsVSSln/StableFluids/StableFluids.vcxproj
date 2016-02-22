@@ -62,7 +62,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\linearSolver.cpp" />
+    <ClCompile Include="..\..\LinearSolver.cpp" />
     <ClCompile Include="..\..\ScalarField.cpp" />
     <ClCompile Include="..\..\StableFluids.cpp" />
     <ClCompile Include="..\..\VectorField.cpp" />
@@ -88,7 +88,7 @@
     <ClInclude Include="..\..\include\Singleton.h" />
     <ClInclude Include="..\..\include\zconf.h" />
     <ClInclude Include="..\..\include\zlib.h" />
-    <ClInclude Include="..\..\linearSolver.hpp" />
+    <ClInclude Include="..\..\LinearSolver.hpp" />
     <ClInclude Include="..\..\ScalarField.hpp" />
     <ClInclude Include="..\..\VectorField.hpp" />
   </ItemGroup>

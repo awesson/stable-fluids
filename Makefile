@@ -2,7 +2,7 @@
 
 CXX = g++
 CXXFLAGS = -g -O2 -Wall -Wno-sign-compare -Iinclude -DHAVE_CONFIG_H
-OBJS = imageio.o StableFluids.o ScalarField.o VectorField.o linearSolver.o
+OBJS = imageio.o StableFluids.o ScalarField.o VectorField.o LinearSolver.o
 
 # Linux
 EXE = StableFluids

@@ -72,7 +72,7 @@ static bool PlaceRed, PlaceGreen, PlaceBlue;
 
 static void InitValues()
 {
-	N = 89;
+	N = 100;
 	Dt = 2;
 	Diff = 0.0;
 	Visc = 0.0;
