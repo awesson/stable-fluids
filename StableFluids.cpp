@@ -11,7 +11,11 @@ StableFluids.cpp : Defines the entry point for the console application.
 #include <stdlib.h>
 #include <stdio.h>
 #include <gfx/vec3.h>
+#ifdef __APPLE__
 #include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
 
 /* Macros */
 

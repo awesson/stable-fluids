@@ -4,7 +4,16 @@ CXX = g++
 CXXFLAGS = -g -O2 -Wall -Wno-sign-compare -Iinclude -DHAVE_CONFIG_H
 OBJS = imageio.o StableFluids.o ScalarField.o VectorField.o linearSolver.o
 
-StableFluids: $(OBJS)
-	$(CXX) -o $@ $^ -lpng -framework GLUT -framework OpenGL
+# Linux
+EXE = StableFluids
+LDFLAGS = -lpng -lGL -lGLU -lglut
+
+# OS X
+ifeq ($(shell uname), Darwin)
+LDFLAGS = -lpng -framework OpenGL -framework GLUT
+endif
+
+$(EXE) : $(OBJS)
+	$(CXX) -o $@ $^ $(CFLAGS) $(LDFLAGS)
 clean:
-	rm $(OBJS) StableFluids
+	rm $(OBJS) $(EXE)
