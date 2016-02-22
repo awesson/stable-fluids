@@ -35,7 +35,7 @@ unsigned char *_loadImgError(int *width, int *height) {
 }
 
 // Returns true iff the string s ends with postfix
-bool _endsWith(char *s, char *postfix) {
+bool _endsWith(const char *s, const char *postfix) {
   int sLen = strlen(s);
   int postfixLen = strlen(postfix);
   if (postfixLen > sLen)
