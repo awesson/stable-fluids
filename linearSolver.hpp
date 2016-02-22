@@ -1,36 +1,32 @@
-#include <math.h> 
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
-
 // Karen's CGD
 
 #define MAX_STEPS 100000
 
 // Matrix class the solver will accept
-class implicitMatrix
+class ImplicitMatrix
 {
- public:
-    virtual ~implicitMatrix() { }
-    virtual void matVecMult(double x[], double r[]) = 0;
+public:
+	virtual ~ImplicitMatrix()
+	{
+	}
 
+	virtual void matVecMult(double x[], double r[]) = 0;
 };
 
 /*******************************************************************************
  * This implicit matrix represents a discrete laplacian operator.
  ******************************************************************************/
-class implicitMatrixLap : public implicitMatrix
+class ImplicitMatrixLap : public ImplicitMatrix
 {
 public:
-    implicitMatrixLap(int m_NumCells);
-    virtual ~implicitMatrixLap();
-    virtual void matVecMult(double x[], double r[]);
+	ImplicitMatrixLap(int m_NumCells);
+	virtual ~ImplicitMatrixLap();
+	virtual void matVecMult(double x[], double r[]);
 
 private:
-    // the width and length of cells of the grid
-    int m_NumCells;
+	// the width and length of cells of the grid
+	int m_NumCells;
 };
-
 
 
 // Solve Ax = b for a symmetric, positive definite matrix A
@@ -40,9 +36,9 @@ private:
 // "epsilon" is the error tolerance
 // "steps", as passed, is the maximum number of steps, or 0 (implying MAX_STEPS)
 // Upon completion, "steps" contains the number of iterations taken
-double ConjGrad(int n, implicitMatrix *A, double x[], double b[], 
-        double epsilon, // how low should we go?
-        int    *steps);
+double ConjGrad(int n, ImplicitMatrix *A, double x[], double b[],
+				double epsilon, // how low should we go?
+				int *steps);
 
 // Some vector helper functions
 void vecAddEqual(int n, double r[], double v[]);

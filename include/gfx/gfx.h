@@ -1,4 +1,5 @@
 #ifndef GFX_INCLUDED // -*- C++ -*-
+
 #define GFX_INCLUDED
 #if !defined(__GNUC__)
 #  pragma once
@@ -62,7 +63,10 @@ const bool true = 1;
 #endif
 
 #if !defined(HAVE_RINT)
-inline double rint(double x) { return floor(x + 0.5); }
+inline double rint(double x)
+{
+	return floor(x + 0.5);
+}
 #endif
 
 ////////////////////////////////////////////////////////////////////////
@@ -71,30 +75,42 @@ inline double rint(double x) { return floor(x + 0.5); }
 //
 namespace gfx
 {
-
 #if defined(HAVE_RANDOM)
   inline double random1() { return (double)random() / (double)LONG_MAX; }
   inline char   random_byte() { return (char)(random() & 0xff); }
 #else
-  inline double random1() { return (double)rand() / (double)RAND_MAX; }
-  inline char   random_byte() { return (char)(rand() & 0xff); }
+	inline double random1()
+	{
+		return (double)rand() / (double)RAND_MAX;
+	}
+
+	inline char random_byte()
+	{
+		return (char)(rand() & 0xff);
+	}
 #endif
 
-const double FEQ_EPS = 1e-6;
-const double FEQ_EPS2 = 1e-12;
+	const double FEQ_EPS = 1e-6;
+	const double FEQ_EPS2 = 1e-12;
 
-inline bool  FEQ(double a, double b, double e=FEQ_EPS)  {return fabs(a-b)<e;}
-inline bool FEQ2(double a, double b, double e=FEQ_EPS2) {return fabs(a-b)<e;}
+	inline bool FEQ(double a, double b, double e = FEQ_EPS)
+	{
+		return fabs(a - b) < e;
+	}
+
+	inline bool FEQ2(double a, double b, double e = FEQ_EPS2)
+	{
+		return fabs(a - b) < e;
+	}
 
 
-////////////////////////////////////////////////////////////////////////
-//
-//
-//
+	////////////////////////////////////////////////////////////////////////
+	//
+	//
+	//
 
 #define TIMING(t, cmd) { t=get_cpu_time(); cmd; t=get_cpu_time() - t; }
-extern double get_cpu_time();
-
+	extern double get_cpu_time();
 } // namespace gfx
 
 #ifndef GFX_NAMESPACE

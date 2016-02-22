@@ -1,9 +1,6 @@
 #pragma once
 
 #include <gfx/vec2.h>
-#include <limits>
-
-#include "linearSolver.hpp"
 
 /******************************************************************************
  * MAC grid representation of a vector field. The vector components are defined
@@ -14,26 +11,27 @@
 class VectorField
 {
 public:
-    VectorField(int numCells, double viscosity, double dt);
-    VectorField(VectorField *copyField);
-    virtual ~VectorField(void);
+	VectorField(int dimentionSize, double viscosity, double dt);
+	VectorField(VectorField *copyField);
+	virtual ~VectorField(void);
 
-    void    TimeStep(VectorField *sourceField, VectorField *velocityField);
-    void    AddField(VectorField *a_SrcField);
-    void    AddField(Vec2 *srouceField);
-    void    Advection(VectorField *oldField);
-    void    VorticityConfinement();
-    void    Projection();
-    Vec2    Interpolate(Vec2 pos);
-    double  BilinearInterpolation(Vec2 pos, int lowX, int lowY, int comp);
+	void TimeStep(VectorField *sourceField, VectorField *velocityField);
+	void AddField(VectorField *a_SrcField);
+	void AddField(Vec2 *srouceField);
+	void Advection(VectorField *oldField);
+	void VorticityConfinement();
+	void Projection();
+	Vec2 Interpolate(Vec2 pos);
+	double BilinearInterpolation(Vec2 pos, int lowX, int lowY, int comp);
 
-    inline Vec2 &operator[](int i)
-    {
-        return m_Field[i];
-    }
+	Vec2& operator[](int i)
+	{
+		return m_Field[i];
+	}
 
-    int     m_NumCells;
-    Vec2    *m_Field;
-    double  m_Viscosity;
-    double  m_Dt;
+	int m_NumCells;
+	int m_DimentionSize;
+	Vec2 *m_Field;
+	double m_Viscosity;
+	double m_Dt;
 };

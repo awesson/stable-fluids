@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\include">
+      <UniqueIdentifier>{b6ae4b1f-d703-4662-b041-e38327c941b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\include\gfx">
+      <UniqueIdentifier>{e462f6a8-af98-4640-862f-62e6a2495062}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\linearSolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ScalarField.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\StableFluids.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\VectorField.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\FieldHelper.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\linearSolver.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ScalarField.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\VectorField.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\pngconf.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Singleton.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\zconf.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\zlib.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gfx\config.h">
+      <Filter>Header Files\include\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gfx\config-vc.h">
+      <Filter>Header Files\include\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gfx\geom3d.h">
+      <Filter>Header Files\include\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gfx\geom4d.h">
+      <Filter>Header Files\include\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gfx\gfx.h">
+      <Filter>Header Files\include\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gfx\mat2.h">
+      <Filter>Header Files\include\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gfx\mat3.h">
+      <Filter>Header Files\include\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gfx\mat4.h">
+      <Filter>Header Files\include\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gfx\quat.h">
+      <Filter>Header Files\include\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gfx\symmat2.h">
+      <Filter>Header Files\include\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gfx\symmat3.h">
+      <Filter>Header Files\include\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gfx\symmat4.h">
+      <Filter>Header Files\include\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gfx\vec2.h">
+      <Filter>Header Files\include\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gfx\vec3.h">
+      <Filter>Header Files\include\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gfx\vec4.h">
+      <Filter>Header Files\include\gfx</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

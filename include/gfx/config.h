@@ -80,3 +80,4 @@
 
 /* Define if <OpenGL/glext.h> header is available (for Apple) */
 /* #undef HAVE_OPENGL_GLEXT_H */
+

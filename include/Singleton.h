@@ -1,21 +1,22 @@
 #pragma once
 #include <assert.h>
 
-template<typename T>
+template <typename T>
 class Singleton
 {
 public:
 	static inline void Create()
 	{
-		if(!pInstance)
+		if (!pInstance)
 			new T();
 	}
+
 	static inline T* Get()
 	{
 		assert(pInstance);
 		return pInstance;
 	}
-	
+
 protected:
 
 	Singleton()
@@ -24,11 +25,11 @@ protected:
 		pInstance = static_cast<T*>(this);
 	}
 
-	Singleton& operator= (const Singleton&);
+	Singleton& operator=(const Singleton &);
 
 private:
-	static	T* pInstance;
-
+	static T *pInstance;
 };
 
-template <typename T> T* Singleton <T>::pInstance = 0;
+template <typename T>
+T *Singleton<T>::pInstance = 0;

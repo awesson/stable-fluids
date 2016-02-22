@@ -12,19 +12,22 @@ class VectorField;
 class ScalarField
 {
 public:
-    ScalarField(int a_NumCells, double a_Viscosity, double a_Dt);
-    ScalarField(ScalarField *CopyField);
-    virtual ~ScalarField(void);
+	ScalarField(int a_NumCells, double a_Viscosity, double a_Dt);
+	ScalarField(ScalarField *CopyField);
+	virtual ~ScalarField(void);
 
-    void    TimeStep(ScalarField *a_SrcField, VectorField *VelocityField);
-    void    AddField(ScalarField *a_SrcField);
-    void    Advection(VectorField *u);
-    double  Interpolate(const Vec2& pos);
+	void TimeStep(ScalarField *a_SrcField, VectorField *VelocityField);
+	void AddField(ScalarField *a_SrcField);
+	void Advection(VectorField *u);
+	double Interpolate(const Vec2 &pos);
 
-    double  &operator[](int i) { return m_Field[i]; }
+	double& operator[](int i)
+	{
+		return m_Field[i];
+	}
 
-    int     m_NumCells;
-    double  *m_Field;
-    double  m_Viscosity;
-    double  m_Dt;
+	int m_NumCells;
+	double *m_Field;
+	double m_Viscosity;
+	double m_Dt;
 };
