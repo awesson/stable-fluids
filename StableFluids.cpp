@@ -263,7 +263,7 @@ static void PostDisplay()
 			
 			glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 			char filename[13];
-			sprintf_s(filename, "img%.5i.png", FrameNumber / FRAME_INTERVAL);
+			sprintf(filename, "img%.5i.png", FrameNumber / FRAME_INTERVAL);
 			printf("Dumped %s.\n", filename);
 			saveImageRGBA(filename, buffer, w, h);
 			free(buffer);
@@ -543,7 +543,7 @@ static void IdleFunc()
 	if (cur_time - PrevFpsTakenTime > 1000)
 	{
 		float fps = (1000.0f * FpsFrameNumber) / static_cast<float>(cur_time - PrevFpsTakenTime);
-		sprintf_s(FpsString, "FPS: %4.2f", fps);
+		sprintf(FpsString, "FPS: %4.2f", fps);
 		PrevFpsTakenTime = cur_time;
 		FpsFrameNumber = 0;
 	}
