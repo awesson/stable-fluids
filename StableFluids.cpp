@@ -21,7 +21,7 @@ StableFluids.cpp : Defines the entry point for the console application.
 
 /* Macros */
 
-#define IX(i,j) ((i)+(N+2)*(j))
+#define IX(i,j) ((i) + (GridSize * (j)))
 
 // Weights for temperature and density
 #define alpha .0005
@@ -29,8 +29,11 @@ StableFluids.cpp : Defines the entry point for the console application.
 
 /* Global variables */
 
-// Grid size
-static int N;
+// Grid size in each dimension
+static int GridSize;
+
+// Total number of cells in the grid
+static int TotalGridCells;
 
 // Simulation time step
 static double Dt;
@@ -72,7 +75,8 @@ static bool PlaceRed, PlaceGreen, PlaceBlue;
 
 static void InitValues()
 {
-	N = 100;
+	GridSize = 89;
+	TotalGridCells = GridSize * GridSize;
 	Dt = 2;
 	Diff = 0.0;
 	Visc = 0.0;
@@ -112,9 +116,9 @@ static void FreeData()
 
 static void ClearData()
 {
-	for (int i = 0; i < (N + 2); i++)
+	for (int i = 0; i < GridSize; i++)
 	{
-		for (int j = 0; j < (N + 2); ++j)
+		for (int j = 0; j < GridSize; ++j)
 		{
 			(*VelocityField)[IX(i,j)] = 0.0;
 			(*AccelerationField)[IX(i,j)] = 0.0;
@@ -132,16 +136,16 @@ static void ClearData()
 
 static int AllocateData()
 {
-	VelocityField = new VectorField(N, Visc, Dt);
-	AccelerationField = new VectorField(N, Visc, Dt);
-	DensityFieldRed = new ScalarField(N, Diff, Dt);
-	DeltaDensityFieldRed = new ScalarField(N, Diff, Dt);
-	DensityFieldGreen = new ScalarField(N, Diff, Dt);
-	DeltaDensityFieldGreen = new ScalarField(N, Diff, Dt);
-	DensityFieldBlue = new ScalarField(N, Diff, Dt);
-	DeltaDensityFieldBlue = new ScalarField(N, Diff, Dt);
-	TemperatureField = new ScalarField(N, Diff, Dt);
-	DeltaTemperatureField = new ScalarField(N, Diff, Dt);
+	VelocityField = new VectorField(GridSize, Visc, Dt);
+	AccelerationField = new VectorField(GridSize, Visc, Dt);
+	DensityFieldRed = new ScalarField(GridSize, Diff, Dt);
+	DeltaDensityFieldRed = new ScalarField(GridSize, Diff, Dt);
+	DensityFieldGreen = new ScalarField(GridSize, Diff, Dt);
+	DeltaDensityFieldGreen = new ScalarField(GridSize, Diff, Dt);
+	DensityFieldBlue = new ScalarField(GridSize, Diff, Dt);
+	DeltaDensityFieldBlue = new ScalarField(GridSize, Diff, Dt);
+	TemperatureField = new ScalarField(GridSize, Diff, Dt);
+	DeltaTemperatureField = new ScalarField(GridSize, Diff, Dt);
 
 	if (!VelocityField || !AccelerationField
 		|| !DensityFieldRed || !DeltaDensityFieldRed
@@ -287,24 +291,24 @@ static void DrawVelocity()
 	int i, j;
 	float x, y, h;
 
-	h = 1.0f / N;
+	h = 1.0f / (GridSize - 2);
 
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glLineWidth(1.0f);
 
 	glBegin(GL_LINES);
 
-	for (i = 1; i <= N; i++)
+	for (i = 1; i < GridSize - 1; i++)
 	{
 		x = (i - 0.5f) * h;
 
-		for (j = 1; j <= N; j++)
+		for (j = 1; j < GridSize - 1; j++)
 		{
 			y = (j - 0.5f) * h;
 
 			glVertex2f(x, y);
-			glVertex2f(x + (*VelocityField)[IX(i,j)][0],
-					   y + (*VelocityField)[IX(i,j)][1]);
+			glVertex2f(x + (*VelocityField)[IX(i, j)][0],
+					   y + (*VelocityField)[IX(i, j)][1]);
 		}
 	}
 
@@ -320,15 +324,15 @@ static void DrawDensity()
 	int i, j;
 	float x, y, h;
 
-	h = 1.0f / N;
+	h = 1.0f / (GridSize - 2);
 
 	glBegin(GL_QUADS);
 
-	for (i = 1; i <= N; i++)
+	for (i = 1; i < GridSize - 1; i++)
 	{
 		x = (i - 0.5f) * h;
 
-		for (j = 1; j <= N; j++)
+		for (j = 1; j < GridSize - 1; j++)
 		{
 			y = (j - 0.5f) * h;
 
@@ -337,20 +341,20 @@ static void DrawDensity()
 			Vec3f tr = Vec3(0, 0, 0); // top right color
 			Vec3f tl = Vec3(0, 0, 0); // top left color
 
-			bl[0] += (*DensityFieldRed)[IX(i,j)];
-			br[0] += (*DensityFieldRed)[IX(i+1,j)];
-			tl[0] += (*DensityFieldRed)[IX(i,j+1)];
-			tr[0] += (*DensityFieldRed)[IX(i+1,j+1)];
+			bl[0] += (*DensityFieldRed)[IX(i, j)];
+			br[0] += (*DensityFieldRed)[IX(i+1, j)];
+			tl[0] += (*DensityFieldRed)[IX(i, j+1)];
+			tr[0] += (*DensityFieldRed)[IX(i+1, j+1)];
 
-			bl[1] += (*DensityFieldGreen)[IX(i,j)];
-			br[1] += (*DensityFieldGreen)[IX(i+1,j)];
-			tl[1] += (*DensityFieldGreen)[IX(i,j+1)];
-			tr[1] += (*DensityFieldGreen)[IX(i+1,j+1)];
+			bl[1] += (*DensityFieldGreen)[IX(i, j)];
+			br[1] += (*DensityFieldGreen)[IX(i+1, j)];
+			tl[1] += (*DensityFieldGreen)[IX(i, j+1)];
+			tr[1] += (*DensityFieldGreen)[IX(i+1, j+1)];
 
-			bl[2] += (*DensityFieldBlue)[IX(i,j)];
-			br[2] += (*DensityFieldBlue)[IX(i+1,j)];
-			tl[2] += (*DensityFieldBlue)[IX(i,j+1)];
-			tr[2] += (*DensityFieldBlue)[IX(i+1,j+1)];
+			bl[2] += (*DensityFieldBlue)[IX(i, j)];
+			br[2] += (*DensityFieldBlue)[IX(i+1, j)];
+			tl[2] += (*DensityFieldBlue)[IX(i, j+1)];
+			tr[2] += (*DensityFieldBlue)[IX(i+1, j+1)];
 
 			glColor3f(bl[0], bl[1], bl[2]);
 			glVertex2f(x, y);
@@ -384,7 +388,7 @@ static void GetFromUI(ScalarField *d,
 					  ScalarField *temp,
 					  VectorField *vel)
 {
-	int i, j, size = (N + 2) * (N + 2);
+	int i, j, size = TotalGridCells;
 
 	// Initialize fields
 	for (i = 0; i < size; i++)
@@ -392,12 +396,15 @@ static void GetFromUI(ScalarField *d,
 		(*vel)[i] = (*d)[i] = (*d2)[i] = (*d3)[i] = (*temp)[i] = 0.0;
 	}
 
+	// If there is no mouse input, then everything stays empty
 	if (!MouseDown[0] && !MouseDown[2]) return;
 
-	i = static_cast<int>((MouseX / static_cast<float>(WinX)) * (N + 2));
-	j = static_cast<int>(((WinY - MouseY) / static_cast<float>(WinY)) * (N + 2));
+	// Convert the mouse position to a grid position
+	i = static_cast<int>((MouseX / static_cast<float>(WinX)) * GridSize);
+	j = static_cast<int>(((WinY - MouseY) / static_cast<float>(WinY)) * GridSize);
 
-	if ((i < 1) || (i > N) || (j < 1) || (j > N)) return;
+	// Make sure the position is within the boundaries
+	if ((i < 1) || (i > GridSize - 2) || (j < 1) || (j > GridSize - 2)) return;
 
 	// Force on velocity field
 	if (MouseDown[0])
@@ -519,21 +526,21 @@ static void IdleFunc()
 
 	// Add gravity and temperature forces to velocity field.
 	// Assumes the ambient temperature is zero.
-	for (int i = 0; i < (N + 2) * (N + 2); ++i)
+	for (int i = 0; i < TotalGridCells; ++i)
 	{
-		double tot_den = DensityFieldRed->m_Field[i]
-					   + DensityFieldGreen->m_Field[i]
-					   + DensityFieldBlue->m_Field[i];
-		double T = TemperatureField->m_Field[i];
-		AccelerationField->m_Field[i] += Vec2(0, -(alpha * tot_den) + (beta * T));
+		double tot_den = (*DensityFieldRed)[i]
+					   + (*DensityFieldGreen)[i]
+					   + (*DensityFieldBlue)[i];
+		double T = (*TemperatureField)[i];
+		(*AccelerationField)[i] += Vec2(0, -(alpha * tot_den) + (beta * T));
 	}
 
 	// Advance sim
-	VelocityField->TimeStep(AccelerationField, VelocityField);
-	DensityFieldRed->TimeStep(DeltaDensityFieldRed, VelocityField);
-	DensityFieldGreen->TimeStep(DeltaDensityFieldGreen, VelocityField);
-	DensityFieldBlue->TimeStep(DeltaDensityFieldBlue, VelocityField);
-	TemperatureField->TimeStep(DeltaTemperatureField, VelocityField);
+	VelocityField->TimeStep(*AccelerationField, *VelocityField);
+	DensityFieldRed->TimeStep(*DeltaDensityFieldRed, *VelocityField);
+	DensityFieldGreen->TimeStep(*DeltaDensityFieldGreen, *VelocityField);
+	DensityFieldBlue->TimeStep(*DeltaDensityFieldBlue, *VelocityField);
+	TemperatureField->TimeStep(*DeltaTemperatureField, *VelocityField);
 
 	glutSetWindow(WinId);
 	glutPostRedisplay();
@@ -606,13 +613,13 @@ int main(int argc, char **argv)
 	{
 		fprintf(stderr, "usage : %s N Dt Diff Visc Force Source\n", argv[0]);
 		fprintf(stderr, "where:\n");
-		fprintf(stderr, "\t N      : Grid resolution\n");
-		fprintf(stderr, "\t Dt     : Time step\n");
-		fprintf(stderr, "\t Diff   : Diffusion rate of the density\n");
-		fprintf(stderr, "\t Visc   : Viscosity of the fluid\n");
-		fprintf(stderr, "\t Force  : Scales the mouse movement that generate a force\n");
-		fprintf(stderr, "\t Source : Amount of density that will be deposited\n");
-		fprintf(stderr, "\t Temp   : The temperature of the fluid\n");
+		fprintf(stderr, "\t GridSize : Grid resolution\n");
+		fprintf(stderr, "\t Dt       : Time step\n");
+		fprintf(stderr, "\t Diff     : Diffusion rate of the density\n");
+		fprintf(stderr, "\t Visc     : Viscosity of the fluid\n");
+		fprintf(stderr, "\t Force    : Scales the mouse movement that generate a force\n");
+		fprintf(stderr, "\t Source   : Amount of density that will be deposited\n");
+		fprintf(stderr, "\t Temp     : The temperature of the fluid\n");
 		exit(1);
 	}
 
@@ -620,12 +627,13 @@ int main(int argc, char **argv)
 
 	if (argc == 1)
 	{
-		fprintf(stderr, "Using defaults : N=%d Dt=%g Diff=%g Visc=%g Force=%g Source=%g Temp=%g\n",
-					  N, Dt, Diff, Visc, Force, Source, Temp);
+		fprintf(stderr, "Using defaults : GridSize=%d Dt=%g Diff=%g Visc=%g Force=%g Source=%g Temp=%g\n",
+					  GridSize, Dt, Diff, Visc, Force, Source, Temp);
 	}
 	else
 	{
-		N = atoi(argv[1]);
+		GridSize = atoi(argv[1]);
+		TotalGridCells = GridSize * GridSize;
 		Dt = atof(argv[2]);
 		Diff = atof(argv[3]);
 		Visc = atof(argv[4]);

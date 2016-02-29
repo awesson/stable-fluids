@@ -68,7 +68,7 @@
     <ClCompile Include="..\..\VectorField.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\FieldHelper.hpp" />
+    <ClInclude Include="..\..\BaseFluidField.hpp" />
     <ClInclude Include="..\..\include\gfx\config-vc.h" />
     <ClInclude Include="..\..\include\gfx\config.h" />
     <ClInclude Include="..\..\include\gfx\geom3d.h" />
