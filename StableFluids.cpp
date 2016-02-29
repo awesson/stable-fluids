@@ -75,7 +75,7 @@ static bool PlaceRed, PlaceGreen, PlaceBlue;
 
 static void InitValues()
 {
-	GridSize = 89;
+	GridSize = 100;
 	TotalGridCells = GridSize * GridSize;
 	Dt = 2;
 	Diff = 0.0;
