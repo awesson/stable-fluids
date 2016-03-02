@@ -4,49 +4,94 @@
 #include "linearSolver.hpp"
 
 
-#define IX_DIM(i, j) ((i) + (m_GridSize * (j)))
-#define ITER_DIM    for(int i = 1; i < m_GridSize - 1; i++){      \
-						for(int j = 1; j < m_GridSize - 1; j++){
-#define ENDITER_DIM }}
+/** Vector helper functions */
+void VecAddEqual(int n, double r[], const double v[])
+{
+	for (int i = 0; i < n; i++)
+	{
+		r[i] = r[i] + v[i];
+	}
+}
 
+void VecDiffEqual(int n, double r[], const double v[])
+{
+	for (int i = 0; i < n; i++)
+	{
+		r[i] = r[i] - v[i];
+	}
+}
+
+void VecAssign(int n, double v1[], const double v2[])
+{
+	memcpy(v1, v2, n * sizeof(double));
+}
+
+void VecTimesScalar(int n, double v[], double s)
+{
+	for (int i = 0; i < n; i++)
+	{
+		v[i] *= s;
+	}
+}
+
+double VecDot(int n, const double v1[], const double v2[])
+{
+	double dot = 0;
+	for (int i = 0; i < n; i++)
+	{
+		dot += v1[i] * v2[i];
+	}
+	return dot;
+}
+
+double VecSqrLen(int n, const double v[])
+{
+	return VecDot(n, v, v);
+}
 
 void ImplicitMatrixLap::MatVecMult(const double x[], double r[]) const
 {
 	/** Interior corners */
 	// Bottom left
-	r[IX_DIM(0, 0)] = x[IX_DIM(0, 1)] + x[IX_DIM(1, 0)] - 2.0f * x[IX_DIM(0, 0)];
+	r[Idx2DTo1D(0, 0)] = x[Idx2DTo1D(0, 1)]
+					   + x[Idx2DTo1D(1, 0)]
+					   - 2.0f * x[Idx2DTo1D(0, 0)];
 	// Top right
-	r[IX_DIM(m_GridSize - 1, m_GridSize - 1)] = x[IX_DIM(m_GridSize - 1, m_GridSize - 2)]
-											  + x[IX_DIM(m_GridSize - 2, m_GridSize - 1)]
-											  - (2.0 * x[IX_DIM(m_GridSize - 1, m_GridSize - 1)]);
+	r[Idx2DTo1D(m_GridSize - 1, m_GridSize - 1)] = x[Idx2DTo1D(m_GridSize - 1, m_GridSize - 2)]
+												 + x[Idx2DTo1D(m_GridSize - 2, m_GridSize - 1)]
+												 - (2.0 * x[Idx2DTo1D(m_GridSize - 1, m_GridSize - 1)]);
 	// Bottom right
-	r[IX_DIM(m_GridSize - 1, 0)] = x[IX_DIM(m_GridSize - 1, 1)]
-								 + x[IX_DIM(m_GridSize - 2, 0)]
-								 - (2.0 * x[IX_DIM(m_GridSize - 1, 0)]);
+	r[Idx2DTo1D(m_GridSize - 1, 0)] = x[Idx2DTo1D(m_GridSize - 1, 1)]
+								    + x[Idx2DTo1D(m_GridSize - 2, 0)]
+									- (2.0 * x[Idx2DTo1D(m_GridSize - 1, 0)]);
 	// Top left
-	r[IX_DIM(0, m_GridSize - 1)] = x[IX_DIM(1, m_GridSize - 1)]
-								 + x[IX_DIM(0, m_GridSize - 2)]
-								 - 2.0 * x[IX_DIM(0, m_GridSize - 1)];
+	r[Idx2DTo1D(0, m_GridSize - 1)] = x[Idx2DTo1D(1, m_GridSize - 1)]
+									+ x[Idx2DTo1D(0, m_GridSize - 2)]
+									- 2.0 * x[Idx2DTo1D(0, m_GridSize - 1)];
 
 	/** Interior edges */
 	for (int i = 1; i < m_GridSize - 1; ++i)
 	{
 		// Left column
-		r[IX_DIM(0, i)] = x[IX_DIM(0, i-1)] + x[IX_DIM(0, i+1)]
-						+ x[IX_DIM(1, i)] - 3.0 * x[IX_DIM(0, i)];
+		r[Idx2DTo1D(0, i)] = x[Idx2DTo1D(0, i - 1)]
+						   + x[Idx2DTo1D(0, i + 1)]
+						   + x[Idx2DTo1D(1, i)]
+						   - 3.0 * x[Idx2DTo1D(0, i)];
 		// Right column
-		r[IX_DIM(m_GridSize - 1, i)] = x[IX_DIM(m_GridSize - 1, i-1)]
-									 + x[IX_DIM(m_GridSize - 1, i+1)]
-									 + x[IX_DIM(m_GridSize - 2, i)]
-									 - (3.0 * x[IX_DIM(m_GridSize - 1, i)]);
+		r[Idx2DTo1D(m_GridSize - 1, i)] = x[Idx2DTo1D(m_GridSize - 1, i - 1)]
+										+ x[Idx2DTo1D(m_GridSize - 1, i + 1)]
+										+ x[Idx2DTo1D(m_GridSize - 2, i)]
+										- (3.0 * x[Idx2DTo1D(m_GridSize - 1, i)]);
 		// Bottom row
-		r[IX_DIM(i, 0)] = x[IX_DIM(i-1, 0)] + x[IX_DIM(i+1, 0)]
-						+ x[IX_DIM(i, 1)] - 3.0 * x[IX_DIM(i, 0)];
+		r[Idx2DTo1D(i, 0)] = x[Idx2DTo1D(i - 1, 0)]
+						   + x[Idx2DTo1D(i + 1, 0)]
+						   + x[Idx2DTo1D(i, 1)]
+						   - 3.0 * x[Idx2DTo1D(i, 0)];
 		// Top row
-		r[IX_DIM(i, m_GridSize - 1)] = x[IX_DIM(i-1, m_GridSize - 1)]
-									 + x[IX_DIM(i+1, m_GridSize - 1)]
-									 + x[IX_DIM(i, m_GridSize - 2)]
-									 - 3.0 * x[IX_DIM(i, m_GridSize - 1)];
+		r[Idx2DTo1D(i, m_GridSize - 1)] = x[Idx2DTo1D(i - 1, m_GridSize - 1)]
+										+ x[Idx2DTo1D(i + 1, m_GridSize - 1)]
+										+ x[Idx2DTo1D(i, m_GridSize - 2)]
+										- 3.0 * x[Idx2DTo1D(i, m_GridSize - 1)];
 	}
 
 	/** Middle grid cells */
@@ -54,11 +99,11 @@ void ImplicitMatrixLap::MatVecMult(const double x[], double r[]) const
 	{
 		for (int j = 1; j < m_GridSize - 1; j++)
 		{
-			r[IX_DIM(i, j)] = x[IX_DIM(i+1, j)]
-							+ x[IX_DIM(i-1, j)]
-							+ x[IX_DIM(i, j+1)]
-							+ x[IX_DIM(i, j-1)]
-							- (4.0 * x[IX_DIM(i, j)]);
+			r[Idx2DTo1D(i, j)] = x[Idx2DTo1D(i + 1, j)]
+							+ x[Idx2DTo1D(i - 1, j)]
+							+ x[Idx2DTo1D(i, j + 1)]
+							+ x[Idx2DTo1D(i, j - 1)]
+							- (4.0 * x[Idx2DTo1D(i, j)]);
 		}
 	}
 }
@@ -161,49 +206,4 @@ double ConjGrad(int n,
 	}
 
 	return rSqrLen;
-}
-
-/** Vector helper functions */
-void VecAddEqual(int n, double r[], const double v[])
-{
-	for (int i = 0; i < n; i++)
-	{
-		r[i] = r[i] + v[i];
-	}
-}
-
-void VecDiffEqual(int n, double r[], const double v[])
-{
-	for (int i = 0; i < n; i++)
-	{
-		r[i] = r[i] - v[i];
-	}
-}
-
-void VecAssign(int n, double v1[], const double v2[])
-{
-	memcpy(v1, v2, n * sizeof(double));
-}
-
-void VecTimesScalar(int n, double v[], double s)
-{
-	for (int i = 0; i < n; i++)
-	{
-		v[i] *= s;
-	}
-}
-
-double VecDot(int n, const double v1[], const double v2[])
-{
-	double dot = 0;
-	for (int i = 0; i < n; i++)
-	{
-		dot += v1[i] * v2[i];
-	}
-	return dot;
-}
-
-double VecSqrLen(int n, const double v[])
-{
-	return VecDot(n, v, v);
 }

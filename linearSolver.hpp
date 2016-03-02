@@ -44,6 +44,11 @@ public:
 private:
 	// The width and length of grid of cells.
 	int m_GridSize;
+
+	int Idx2DTo1D(int x, int y) const
+	{
+		return x + (m_GridSize * y);
+	}
 };
 
 /*****************************************************************************
@@ -66,11 +71,3 @@ double ConjGrad(int n,
 				const double b[],
 				double epsilon,
 				int *steps);
-
-/** Some vector helper functions. */
-void VecAddEqual(int n, double r[], const double v[]);
-void VecDiffEqual(int n, double r[], const double v[]);
-void VecAssign(int n, double v1[], const double v2[]);
-void VecTimesScalar(int n, double v[], double s);
-double VecDot(int n, const double v1[], const double v2[]);
-double VecSqrLen(int n, const double v[]);
