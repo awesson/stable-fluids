@@ -290,20 +290,20 @@ static void DrawVelocity()
 	int i, j;
 	float x, y, h;
 
-	h = 1.0f / (GridSize - 2);
+	h = 1.0f / GridSize;
 
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glLineWidth(1.0f);
 
 	glBegin(GL_LINES);
 
-	for (i = 1; i < GridSize - 1; i++)
+	for (i = 0; i < GridSize - 1; i++)
 	{
-		x = (i - 0.5f) * h;
+		x = (i + 0.5f) * h;
 
-		for (j = 1; j < GridSize - 1; j++)
+		for (j = 0; j < GridSize - 1; j++)
 		{
-			y = (j - 0.5f) * h;
+			y = (j + 0.5f) * h;
 
 			glVertex2f(x, y);
 			glVertex2f(x + (*VelocityField)[IX(i, j)][0],
@@ -323,17 +323,17 @@ static void DrawDensity()
 	int i, j;
 	float x, y, h;
 
-	h = 1.0f / (GridSize - 2);
+	h = 1.0f / GridSize;
 
 	glBegin(GL_QUADS);
 
-	for (i = 1; i < GridSize - 1; i++)
+	for (i = 0; i < GridSize - 1; i++)
 	{
-		x = (i - 0.5f) * h;
+		x = (i + 0.5f) * h;
 
-		for (j = 1; j < GridSize - 1; j++)
+		for (j = 0; j < GridSize - 1; j++)
 		{
-			y = (j - 0.5f) * h;
+			y = (j + 0.5f) * h;
 
 			Vec3f bl = Vec3(0, 0, 0); // bottom left color
 			Vec3f br = Vec3(0, 0, 0); // bottom right color
@@ -387,29 +387,29 @@ static void GetFromUI(ScalarField *d,
 					  ScalarField *temp,
 					  VectorField *vel)
 {
-	int i, j, size = TotalGridCells;
+	int x, y, size = TotalGridCells;
 
 	// Initialize fields
-	for (i = 0; i < size; i++)
+	for (x = 0; x < size; x++)
 	{
-		(*vel)[i] = (*d)[i] = (*d2)[i] = (*d3)[i] = (*temp)[i] = 0.0;
+		(*vel)[x] = (*d)[x] = (*d2)[x] = (*d3)[x] = (*temp)[x] = 0.0;
 	}
 
 	// If there is no mouse input, then everything stays empty
 	if (!MouseDown[0] && !MouseDown[2]) return;
 
 	// Convert the mouse position to a grid position
-	i = static_cast<int>((MouseX / static_cast<float>(WinX)) * GridSize);
-	j = static_cast<int>(((WinY - MouseY) / static_cast<float>(WinY)) * GridSize);
+	x = static_cast<int>((MouseX / static_cast<float>(WinX)) * GridSize);
+	y = static_cast<int>(((WinY - MouseY) / static_cast<float>(WinY)) * GridSize);
 
 	// Make sure the position is within the boundaries
-	if ((i < 1) || (i > GridSize - 2) || (j < 1) || (j > GridSize - 2)) return;
+	if (!d->IsPositionWithinBounds(x, y)) return;
 
 	// Force on velocity field
 	if (MouseDown[0])
 	{
-		(*vel)[IX(i, j)][0] = Force * (MouseX - ClickOriginMouseX);
-		(*vel)[IX(i, j)][1] = Force * (ClickOriginMouseY - MouseY);
+		(*vel)[IX(x, y)][0] = Force * (MouseX - ClickOriginMouseX);
+		(*vel)[IX(x, y)][1] = Force * (ClickOriginMouseY - MouseY);
 	}
 
 	// Add fluid
@@ -417,20 +417,20 @@ static void GetFromUI(ScalarField *d,
 	{
 		if (PlaceRed)
 		{
-			(*d)[IX(i,j)] = Source;
+			(*d)[IX(x,y)] = Source;
 		}
 
 		if (PlaceGreen)
 		{
-			(*d2)[IX(i,j)] = Source;
+			(*d2)[IX(x,y)] = Source;
 		}
 
 		if (PlaceBlue)
 		{
-			(*d3)[IX(i,j)] = Source;
+			(*d3)[IX(x,y)] = Source;
 		}
 
-		(*temp)[IX(i,j)] = Temp;
+		(*temp)[IX(x,y)] = Temp;
 	}
 
 	ClickOriginMouseX = MouseX;
@@ -610,9 +610,9 @@ int main(int argc, char **argv)
 
 	if (argc != 1 && argc != 8)
 	{
-		fprintf(stderr, "usage : %s N Dt Diff Visc Force Source\n", argv[0]);
+		fprintf(stderr, "usage : %s GridSize Dt Diff Visc Force Source\n", argv[0]);
 		fprintf(stderr, "where:\n");
-		fprintf(stderr, "\t GridSize : Grid resolution\n");
+		fprintf(stderr, "\t GridSize : Grid width/height\n");
 		fprintf(stderr, "\t Dt       : Time step\n");
 		fprintf(stderr, "\t Diff     : Diffusion rate of the density\n");
 		fprintf(stderr, "\t Visc     : Viscosity of the fluid\n");

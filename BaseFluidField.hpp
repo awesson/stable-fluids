@@ -60,6 +60,15 @@ public:
 	/*************************************************************************
 	 * Index accessor to the ith grid point.
 	 *************************************************************************/
+	bool IsPositionWithinBounds(int x, int y)
+	{
+		return ((x > 0) && (x < m_GridSize - 1)
+			&& (y > 0) && (y < m_GridSize - 1));
+	}
+
+	/*************************************************************************
+	 * Index accessor to the ith grid point.
+	 *************************************************************************/
 	T& operator[](int i) const
 	{
 		return m_Field[i];

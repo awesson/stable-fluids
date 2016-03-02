@@ -12,60 +12,47 @@
 
 void ImplicitMatrixLap::MatVecMult(const double x[], double r[]) const
 {
-	// Set the boundaries explicitly to zero
-	for (int i = 0; i < m_GridSize; ++i)
-	{
-		// Bottom
-		r[IX_DIM(i, 0)] = 0;
-		// Left
-		r[IX_DIM(0, i)] = 0;
-		// Top
-		r[IX_DIM(i, m_GridSize - 1)] = 0;
-		// Right
-		r[IX_DIM(m_GridSize - 1, i)] = 0;
-	}
-
 	/** Interior corners */
 	// Bottom left
-	r[IX_DIM(1, 1)] = x[IX_DIM(1, 2)] + x[IX_DIM(2, 1)] - 2.0f * x[IX_DIM(1, 1)];
+	r[IX_DIM(0, 0)] = x[IX_DIM(0, 1)] + x[IX_DIM(1, 0)] - 2.0f * x[IX_DIM(0, 0)];
 	// Top right
-	r[IX_DIM(m_GridSize - 2, m_GridSize - 2)] = x[IX_DIM(m_GridSize - 2, m_GridSize - 3)]
-											  + x[IX_DIM(m_GridSize - 3, m_GridSize - 2)]
-											  - (2.0 * x[IX_DIM(m_GridSize - 2, m_GridSize - 2)]);
+	r[IX_DIM(m_GridSize - 1, m_GridSize - 1)] = x[IX_DIM(m_GridSize - 1, m_GridSize - 2)]
+											  + x[IX_DIM(m_GridSize - 2, m_GridSize - 1)]
+											  - (2.0 * x[IX_DIM(m_GridSize - 1, m_GridSize - 1)]);
 	// Bottom right
-	r[IX_DIM(m_GridSize - 2, 1)] = x[IX_DIM(m_GridSize - 2, 2)]
-								 + x[IX_DIM(m_GridSize - 3, 1)]
-								 - (2.0 * x[IX_DIM(m_GridSize - 2, 1)]);
+	r[IX_DIM(m_GridSize - 1, 0)] = x[IX_DIM(m_GridSize - 1, 1)]
+								 + x[IX_DIM(m_GridSize - 2, 0)]
+								 - (2.0 * x[IX_DIM(m_GridSize - 1, 0)]);
 	// Top left
-	r[IX_DIM(1, m_GridSize - 2)] = x[IX_DIM(2, m_GridSize - 2)]
-								 + x[IX_DIM(1, m_GridSize - 3)]
-								 - 2.0 * x[IX_DIM(1, m_GridSize - 2)];
+	r[IX_DIM(0, m_GridSize - 1)] = x[IX_DIM(1, m_GridSize - 1)]
+								 + x[IX_DIM(0, m_GridSize - 2)]
+								 - 2.0 * x[IX_DIM(0, m_GridSize - 1)];
 
 	/** Interior edges */
-	for (int i = 2; i < m_GridSize - 2; ++i)
+	for (int i = 1; i < m_GridSize - 1; ++i)
 	{
 		// Left column
-		r[IX_DIM(1, i)] = x[IX_DIM(1, i-1)] + x[IX_DIM(1, i+1)]
-						+ x[IX_DIM(2, i)] - 3.0 * x[IX_DIM(1, i)];
+		r[IX_DIM(0, i)] = x[IX_DIM(0, i-1)] + x[IX_DIM(0, i+1)]
+						+ x[IX_DIM(1, i)] - 3.0 * x[IX_DIM(0, i)];
 		// Right column
-		r[IX_DIM(m_GridSize - 2, i)] = x[IX_DIM(m_GridSize - 2, i-1)]
-									 + x[IX_DIM(m_GridSize - 2, i+1)]
-									 + x[IX_DIM(m_GridSize - 3, i)]
-									 - (3.0 * x[IX_DIM(m_GridSize - 2, i)]);
+		r[IX_DIM(m_GridSize - 1, i)] = x[IX_DIM(m_GridSize - 1, i-1)]
+									 + x[IX_DIM(m_GridSize - 1, i+1)]
+									 + x[IX_DIM(m_GridSize - 2, i)]
+									 - (3.0 * x[IX_DIM(m_GridSize - 1, i)]);
 		// Bottom row
-		r[IX_DIM(i, 1)] = x[IX_DIM(i-1, 1)] + x[IX_DIM(i+1, 1)]
-						+ x[IX_DIM(i, 2)] - 3.0 * x[IX_DIM(i, 1)];
+		r[IX_DIM(i, 0)] = x[IX_DIM(i-1, 0)] + x[IX_DIM(i+1, 0)]
+						+ x[IX_DIM(i, 1)] - 3.0 * x[IX_DIM(i, 0)];
 		// Top row
-		r[IX_DIM(i, m_GridSize - 2)] = x[IX_DIM(i-1, m_GridSize - 2)]
-									 + x[IX_DIM(i+1, m_GridSize - 2)]
-									 + x[IX_DIM(i, m_GridSize - 3)]
-									 - 3.0 * x[IX_DIM(i, m_GridSize - 2)];
+		r[IX_DIM(i, m_GridSize - 1)] = x[IX_DIM(i-1, m_GridSize - 1)]
+									 + x[IX_DIM(i+1, m_GridSize - 1)]
+									 + x[IX_DIM(i, m_GridSize - 2)]
+									 - 3.0 * x[IX_DIM(i, m_GridSize - 1)];
 	}
 
 	/** Middle grid cells */
-	for (int i = 2; i < m_GridSize - 2; i++)
+	for (int i = 1; i < m_GridSize - 1; i++)
 	{
-		for (int j = 2; j < m_GridSize - 2; j++)
+		for (int j = 1; j < m_GridSize - 1; j++)
 		{
 			r[IX_DIM(i, j)] = x[IX_DIM(i+1, j)]
 							+ x[IX_DIM(i-1, j)]
