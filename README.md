@@ -1,3 +1,6 @@
+#Stable Fluids
+Resurrected old project from college. 2D fluid simulation of incompressible fluids based on Jos Stam's Stable Fluids paper.
+
 ## TO COMPILE:
 Useful reference for installing openGL/GLUT:
 http://web.eecs.umich.edu/~sugih/courses/eecs487/glut-howto/
