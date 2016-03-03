@@ -5,6 +5,15 @@
 
 #define EPSILON 1.0e-10
 
+
+/*****************************************************************************
+ * Helper function for 2D accesses into a field.
+ *****************************************************************************/
+inline int Idx2DTo1D(int size, int x, int y)
+{
+	return x + (size * y);
+}
+
 /*****************************************************************************
  * Abstract class representing a fluid field.
  * It uses a MAC grid representation with values defined
@@ -74,12 +83,17 @@ public:
 		return m_Field[i];
 	}
 
+	int Idx2DTo1D(int x, int y) const
+	{
+		return ::Idx2DTo1D(m_GridSize, x, y);
+	}
+
 	/*************************************************************************
 	 * Coordinate accessor to the grid point at (x, y).
 	 *************************************************************************/
 	T& operator()(int x, int y) const
 	{
-		return m_Field[x + (m_GridSize * y)];
+		return m_Field[Idx2DTo1D(x, y)];
 	}
 
 	/*************************************************************************

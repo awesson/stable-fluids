@@ -11,7 +11,6 @@ ScalarField.cpp : Implementation of the scalar field class.
 
 
 // macros for looping and indexing into the grid
-#define IX_DIM(i, j) ((i) + (m_GridSize * (j)))
 #define ITER_DIM     for(int i = 1; i < m_GridSize - 1; i++){         \
 						 for(int j = 1; j < m_GridSize - 1; j++){
 #define ENDITER_DIM  }}
@@ -40,7 +39,7 @@ void ScalarField::Advection(const VectorField& vectorField)
 		ClipPos(prevPos, curPos, vel, m_GridSize);
 
 		// Set the scalar to the interpolated scalar at the earlier position
-		newField[IX_DIM(i, j)] = Interpolate(prevPos);
+		newField[Idx2DTo1D(i, j)] = Interpolate(prevPos);
 	ENDITER_DIM
 
 	// Set boundaries explicitly to the interior edges of the grid so that
@@ -49,26 +48,26 @@ void ScalarField::Advection(const VectorField& vectorField)
 	for (int i = 1; i < m_GridSize - 1; ++i)
 	{
 		// Bottom
-		newField[IX_DIM(i, 0)] = newField[IX_DIM(i, 1)];
+		newField[Idx2DTo1D(i, 0)] = newField[Idx2DTo1D(i, 1)];
 		// Left
-		newField[IX_DIM(0, i)] = newField[IX_DIM(1, i)];
+		newField[Idx2DTo1D(0, i)] = newField[Idx2DTo1D(1, i)];
 		// Top
-		newField[IX_DIM(i, m_GridSize - 1)] = newField[IX_DIM(i, m_GridSize - 2)];
+		newField[Idx2DTo1D(i, m_GridSize - 1)] = newField[Idx2DTo1D(i, m_GridSize - 2)];
 		// Right
 		(m_GridSize - 1, i) = (m_GridSize - 2, i);
 	}
 	// Bottom-left
-	newField[IX_DIM(0, 0)] = newField[IX_DIM(1, 1)];
+	newField[Idx2DTo1D(0, 0)] = newField[Idx2DTo1D(1, 1)];
 	// Top-left
-	newField[IX_DIM(0, m_GridSize - 1)] = newField[IX_DIM(1, m_GridSize - 2)];
+	newField[Idx2DTo1D(0, m_GridSize - 1)] = newField[Idx2DTo1D(1, m_GridSize - 2)];
 	// Bottom-right
-	newField[IX_DIM(m_GridSize - 1, 0)] = newField[IX_DIM(m_GridSize - 2, 1)];
+	newField[Idx2DTo1D(m_GridSize - 1, 0)] = newField[Idx2DTo1D(m_GridSize - 2, 1)];
 	// Top-right
-	newField[IX_DIM(m_GridSize - 1, m_GridSize - 1)] = newField[IX_DIM(m_GridSize - 2, m_GridSize - 2)];
+	newField[Idx2DTo1D(m_GridSize - 1, m_GridSize - 1)] = newField[Idx2DTo1D(m_GridSize - 2, m_GridSize - 2)];
 
 	// Update scalar field
 	ITER_DIM
-		m_Field[IX_DIM(i,j)] = newField[IX_DIM(i,j)];
+		m_Field[Idx2DTo1D(i,j)] = newField[Idx2DTo1D(i,j)];
 	ENDITER_DIM
 
 	delete[] newField;
@@ -82,11 +81,11 @@ double ScalarField::Interpolate(const Vec2 &pos) const
 
 	double scalar_low_x, scalar_high_x;
 	// Interpolate between y values at the lower x positions
-	scalar_low_x = ((low_y + 0.5f) - pos[1]) * m_Field[IX_DIM(low_x, low_y)]
-				 + (pos[1] - (low_y - 0.5f)) * m_Field[IX_DIM(low_x, low_y+1)];
+	scalar_low_x = ((low_y + 0.5f) - pos[1]) * m_Field[Idx2DTo1D(low_x, low_y)]
+				 + (pos[1] - (low_y - 0.5f)) * m_Field[Idx2DTo1D(low_x, low_y+1)];
 	// Interpolate between y values at the higher x positions
-	scalar_high_x = ((low_y + 0.5f) - pos[1]) * m_Field[IX_DIM(low_x+1, low_y)]
-				  + (pos[1] - (low_y - 0.5f)) * m_Field[IX_DIM(low_x+1, low_y+1)];
+	scalar_high_x = ((low_y + 0.5f) - pos[1]) * m_Field[Idx2DTo1D(low_x+1, low_y)]
+				  + (pos[1] - (low_y - 0.5f)) * m_Field[Idx2DTo1D(low_x+1, low_y+1)];
 
 	// Interpolate between the averaged values at the low and high x positions
 	return ((low_x + 0.5f) - pos[0]) * scalar_low_x

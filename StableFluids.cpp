@@ -19,13 +19,11 @@ StableFluids.cpp : Defines the entry point for the console application.
 #include <GL/glut.h>
 #endif
 
-/* Macros */
-
-#define IX(i,j) ((i) + (GridSize * (j)))
 
 // Weights for temperature and density
 #define alpha .0005
 #define beta .003
+
 
 /* Global variables */
 
@@ -73,6 +71,17 @@ static int ClickOriginMouseX, ClickOriginMouseY, MouseX, MouseY;
 static bool PlaceRed, PlaceGreen, PlaceBlue;
 
 
+/*****************************************************************************
+ * Helper function for 2D accesses into a field.
+ *****************************************************************************/
+inline int Idx2DTo1D(int x, int y)
+{
+	return Idx2DTo1D(GridSize, x, y);
+}
+
+/*****************************************************************************
+ * Initialize all static variables to default values.
+ *****************************************************************************/
 static void InitValues()
 {
 	GridSize = 100;
@@ -120,16 +129,16 @@ static void ClearData()
 	{
 		for (int j = 0; j < GridSize; ++j)
 		{
-			(*VelocityField)[IX(i,j)] = 0.0;
-			(*AccelerationField)[IX(i,j)] = 0.0;
-			(*DensityFieldRed)[IX(i,j)] = 0.0;
-			(*DeltaDensityFieldRed)[IX(i,j)] = 0.0;
-			(*DensityFieldGreen)[IX(i,j)] = 0.0;
-			(*DeltaDensityFieldGreen)[IX(i,j)] = 0.0;
-			(*DensityFieldBlue)[IX(i,j)] = 0.0;
-			(*DeltaDensityFieldBlue)[IX(i,j)] = 0.0;
-			(*DeltaTemperatureField)[IX(i,j)] = 0.0;
-			(*TemperatureField)[IX(i,j)] = 0.0;
+			(*VelocityField)[Idx2DTo1D(i, j)] = 0.0;
+			(*AccelerationField)[Idx2DTo1D(i, j)] = 0.0;
+			(*DensityFieldRed)[Idx2DTo1D(i, j)] = 0.0;
+			(*DeltaDensityFieldRed)[Idx2DTo1D(i, j)] = 0.0;
+			(*DensityFieldGreen)[Idx2DTo1D(i, j)] = 0.0;
+			(*DeltaDensityFieldGreen)[Idx2DTo1D(i, j)] = 0.0;
+			(*DensityFieldBlue)[Idx2DTo1D(i, j)] = 0.0;
+			(*DeltaDensityFieldBlue)[Idx2DTo1D(i, j)] = 0.0;
+			(*DeltaTemperatureField)[Idx2DTo1D(i, j)] = 0.0;
+			(*TemperatureField)[Idx2DTo1D(i, j)] = 0.0;
 		}
 	}
 }
@@ -306,8 +315,8 @@ static void DrawVelocity()
 			y = (j + 0.5f) * h;
 
 			glVertex2f(x, y);
-			glVertex2f(x + (*VelocityField)[IX(i, j)][0],
-					   y + (*VelocityField)[IX(i, j)][1]);
+			glVertex2f(x + (*VelocityField)[Idx2DTo1D(i, j)][0],
+					   y + (*VelocityField)[Idx2DTo1D(i, j)][1]);
 		}
 	}
 
@@ -340,20 +349,20 @@ static void DrawDensity()
 			Vec3f tr = Vec3(0, 0, 0); // top right color
 			Vec3f tl = Vec3(0, 0, 0); // top left color
 
-			bl[0] += (*DensityFieldRed)[IX(i, j)];
-			br[0] += (*DensityFieldRed)[IX(i+1, j)];
-			tl[0] += (*DensityFieldRed)[IX(i, j+1)];
-			tr[0] += (*DensityFieldRed)[IX(i+1, j+1)];
+			bl[0] += (*DensityFieldRed)[Idx2DTo1D(i, j)];
+			br[0] += (*DensityFieldRed)[Idx2DTo1D(i+1, j)];
+			tl[0] += (*DensityFieldRed)[Idx2DTo1D(i, j+1)];
+			tr[0] += (*DensityFieldRed)[Idx2DTo1D(i+1, j+1)];
 
-			bl[1] += (*DensityFieldGreen)[IX(i, j)];
-			br[1] += (*DensityFieldGreen)[IX(i+1, j)];
-			tl[1] += (*DensityFieldGreen)[IX(i, j+1)];
-			tr[1] += (*DensityFieldGreen)[IX(i+1, j+1)];
+			bl[1] += (*DensityFieldGreen)[Idx2DTo1D(i, j)];
+			br[1] += (*DensityFieldGreen)[Idx2DTo1D(i+1, j)];
+			tl[1] += (*DensityFieldGreen)[Idx2DTo1D(i, j+1)];
+			tr[1] += (*DensityFieldGreen)[Idx2DTo1D(i+1, j+1)];
 
-			bl[2] += (*DensityFieldBlue)[IX(i, j)];
-			br[2] += (*DensityFieldBlue)[IX(i+1, j)];
-			tl[2] += (*DensityFieldBlue)[IX(i, j+1)];
-			tr[2] += (*DensityFieldBlue)[IX(i+1, j+1)];
+			bl[2] += (*DensityFieldBlue)[Idx2DTo1D(i, j)];
+			br[2] += (*DensityFieldBlue)[Idx2DTo1D(i+1, j)];
+			tl[2] += (*DensityFieldBlue)[Idx2DTo1D(i, j+1)];
+			tr[2] += (*DensityFieldBlue)[Idx2DTo1D(i+1, j+1)];
 
 			glColor3f(bl[0], bl[1], bl[2]);
 			glVertex2f(x, y);
@@ -408,8 +417,8 @@ static void GetFromUI(ScalarField *d,
 	// Force on velocity field
 	if (MouseDown[0])
 	{
-		(*vel)[IX(x, y)][0] = Force * (MouseX - ClickOriginMouseX);
-		(*vel)[IX(x, y)][1] = Force * (ClickOriginMouseY - MouseY);
+		(*vel)[Idx2DTo1D(x, y)][0] = Force * (MouseX - ClickOriginMouseX);
+		(*vel)[Idx2DTo1D(x, y)][1] = Force * (ClickOriginMouseY - MouseY);
 	}
 
 	// Add fluid
@@ -417,20 +426,20 @@ static void GetFromUI(ScalarField *d,
 	{
 		if (PlaceRed)
 		{
-			(*d)[IX(x,y)] = Source;
+			(*d)[Idx2DTo1D(x,y)] = Source;
 		}
 
 		if (PlaceGreen)
 		{
-			(*d2)[IX(x,y)] = Source;
+			(*d2)[Idx2DTo1D(x,y)] = Source;
 		}
 
 		if (PlaceBlue)
 		{
-			(*d3)[IX(x,y)] = Source;
+			(*d3)[Idx2DTo1D(x,y)] = Source;
 		}
 
-		(*temp)[IX(x,y)] = Temp;
+		(*temp)[Idx2DTo1D(x,y)] = Temp;
 	}
 
 	ClickOriginMouseX = MouseX;
