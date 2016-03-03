@@ -109,6 +109,7 @@ static void InitValues()
 free/clear/allocate simulation data
 -------------------------------------------------------------------------------
 */
+
 static void FreeData()
 {
 	if (VelocityField) delete (VelocityField);
@@ -125,20 +126,20 @@ static void FreeData()
 
 static void ClearData()
 {
-	for (int i = 0; i < GridSize; i++)
+	for (int y = 0; y < GridSize; y++)
 	{
-		for (int j = 0; j < GridSize; ++j)
+		for (int x = 0; x < GridSize; ++x)
 		{
-			(*VelocityField)[Idx2DTo1D(i, j)] = 0.0;
-			(*AccelerationField)[Idx2DTo1D(i, j)] = 0.0;
-			(*DensityFieldRed)[Idx2DTo1D(i, j)] = 0.0;
-			(*DeltaDensityFieldRed)[Idx2DTo1D(i, j)] = 0.0;
-			(*DensityFieldGreen)[Idx2DTo1D(i, j)] = 0.0;
-			(*DeltaDensityFieldGreen)[Idx2DTo1D(i, j)] = 0.0;
-			(*DensityFieldBlue)[Idx2DTo1D(i, j)] = 0.0;
-			(*DeltaDensityFieldBlue)[Idx2DTo1D(i, j)] = 0.0;
-			(*DeltaTemperatureField)[Idx2DTo1D(i, j)] = 0.0;
-			(*TemperatureField)[Idx2DTo1D(i, j)] = 0.0;
+			(*VelocityField)[Idx2DTo1D(x, y)] = 0.0;
+			(*AccelerationField)[Idx2DTo1D(x, y)] = 0.0;
+			(*DensityFieldRed)[Idx2DTo1D(x, y)] = 0.0;
+			(*DeltaDensityFieldRed)[Idx2DTo1D(x, y)] = 0.0;
+			(*DensityFieldGreen)[Idx2DTo1D(x, y)] = 0.0;
+			(*DeltaDensityFieldGreen)[Idx2DTo1D(x, y)] = 0.0;
+			(*DensityFieldBlue)[Idx2DTo1D(x, y)] = 0.0;
+			(*DeltaDensityFieldBlue)[Idx2DTo1D(x, y)] = 0.0;
+			(*DeltaTemperatureField)[Idx2DTo1D(x, y)] = 0.0;
+			(*TemperatureField)[Idx2DTo1D(x, y)] = 0.0;
 		}
 	}
 }
@@ -290,10 +291,10 @@ static void PostDisplay()
 	glutSwapBuffers();
 }
 
-/**
+/*****************************************************************************
   * Draws vectors scaled by the magnitude of the velocity,
   * representing the velocity field.
-  **/
+  ****************************************************************************/
 static void DrawVelocity()
 {
 	int i, j;
@@ -306,13 +307,15 @@ static void DrawVelocity()
 
 	glBegin(GL_LINES);
 
-	for (i = 0; i < GridSize - 1; i++)
-	{
-		x = (i + 0.5f) * h;
 
-		for (j = 0; j < GridSize - 1; j++)
+
+	for (j = 0; j < GridSize - 1; j++)
+	{
+		y = (j + 0.5f) * h;
+
+		for (i = 0; i < GridSize - 1; i++)
 		{
-			y = (j + 0.5f) * h;
+			x = (i + 0.5f) * h;
 
 			glVertex2f(x, y);
 			glVertex2f(x + (*VelocityField)[Idx2DTo1D(i, j)][0],
@@ -323,10 +326,10 @@ static void DrawVelocity()
 	glEnd();
 }
 
-/**
+/*****************************************************************************
   * Draws the color of each density field scaled
   * by the magnitude of the density at that point.
-  **/
+  ****************************************************************************/
 static void DrawDensity()
 {
 	int i, j;
@@ -336,13 +339,13 @@ static void DrawDensity()
 
 	glBegin(GL_QUADS);
 
-	for (i = 0; i < GridSize - 1; i++)
+	for (j = 0; j < GridSize - 1; j++)
 	{
-		x = (i + 0.5f) * h;
+		y = (j + 0.5f) * h;
 
-		for (j = 0; j < GridSize - 1; j++)
+		for (i = 0; i < GridSize - 1; i++)
 		{
-			y = (j + 0.5f) * h;
+			x = (i + 0.5f) * h;
 
 			Vec3f bl = Vec3(0, 0, 0); // bottom left color
 			Vec3f br = Vec3(0, 0, 0); // bottom right color
@@ -350,19 +353,19 @@ static void DrawDensity()
 			Vec3f tl = Vec3(0, 0, 0); // top left color
 
 			bl[0] += (*DensityFieldRed)[Idx2DTo1D(i, j)];
-			br[0] += (*DensityFieldRed)[Idx2DTo1D(i+1, j)];
-			tl[0] += (*DensityFieldRed)[Idx2DTo1D(i, j+1)];
-			tr[0] += (*DensityFieldRed)[Idx2DTo1D(i+1, j+1)];
+			br[0] += (*DensityFieldRed)[Idx2DTo1D(i + 1, j)];
+			tl[0] += (*DensityFieldRed)[Idx2DTo1D(i, j + 1)];
+			tr[0] += (*DensityFieldRed)[Idx2DTo1D(i + 1, j + 1)];
 
 			bl[1] += (*DensityFieldGreen)[Idx2DTo1D(i, j)];
-			br[1] += (*DensityFieldGreen)[Idx2DTo1D(i+1, j)];
-			tl[1] += (*DensityFieldGreen)[Idx2DTo1D(i, j+1)];
-			tr[1] += (*DensityFieldGreen)[Idx2DTo1D(i+1, j+1)];
+			br[1] += (*DensityFieldGreen)[Idx2DTo1D(i + 1, j)];
+			tl[1] += (*DensityFieldGreen)[Idx2DTo1D(i, j + 1)];
+			tr[1] += (*DensityFieldGreen)[Idx2DTo1D(i + 1, j + 1)];
 
 			bl[2] += (*DensityFieldBlue)[Idx2DTo1D(i, j)];
-			br[2] += (*DensityFieldBlue)[Idx2DTo1D(i+1, j)];
-			tl[2] += (*DensityFieldBlue)[Idx2DTo1D(i, j+1)];
-			tr[2] += (*DensityFieldBlue)[Idx2DTo1D(i+1, j+1)];
+			br[2] += (*DensityFieldBlue)[Idx2DTo1D(i + 1, j)];
+			tl[2] += (*DensityFieldBlue)[Idx2DTo1D(i, j + 1)];
+			tr[2] += (*DensityFieldBlue)[Idx2DTo1D(i + 1, j + 1)];
 
 			glColor3f(bl[0], bl[1], bl[2]);
 			glVertex2f(x, y);
@@ -378,28 +381,31 @@ static void DrawDensity()
 	glEnd();
 }
 
-/**
+
+/*****************************************************************************
  * Relates mouse movements to forces/sources.
  * Adds a force to the velocity field for single click dragging.
  * Adds density and temperature when double clicking.
- * The color will be a combination of the bool values set by the r, g, and b keys.
+ * The color will be a combination of the bool values
+ * set by the r, g, and b keys.
  *
- * @param[out] d    The red fluid density
- * @param[out] d2   The green fluid density
- * @param[out] d3   The blue fluid density
- * @param[out] t    The temperate field
- * @param[out] vel  The velocity field representing the effects of the user forces
- **/
+ * @param[out] d   The red fluid density
+ * @param[out] d2  The green fluid density
+ * @param[out] d3  The blue fluid density
+ * @param[out] t   The temperate field
+ * @param[out] vel The velocity field representing the effects of
+ *				   the user forces
+ *****************************************************************************/
 static void GetFromUI(ScalarField *d,
 					  ScalarField *d2,
 					  ScalarField *d3,
 					  ScalarField *temp,
 					  VectorField *vel)
 {
-	int x, y, size = TotalGridCells;
+	int x, y;
 
 	// Initialize fields
-	for (x = 0; x < size; x++)
+	for (x = 0; x < TotalGridCells; x++)
 	{
 		(*vel)[x] = (*d)[x] = (*d2)[x] = (*d3)[x] = (*temp)[x] = 0.0;
 	}
@@ -426,27 +432,26 @@ static void GetFromUI(ScalarField *d,
 	{
 		if (PlaceRed)
 		{
-			(*d)[Idx2DTo1D(x,y)] = Source;
+			(*d)[Idx2DTo1D(x, y)] = Source;
 		}
 
 		if (PlaceGreen)
 		{
-			(*d2)[Idx2DTo1D(x,y)] = Source;
+			(*d2)[Idx2DTo1D(x, y)] = Source;
 		}
 
 		if (PlaceBlue)
 		{
-			(*d3)[Idx2DTo1D(x,y)] = Source;
+			(*d3)[Idx2DTo1D(x, y)] = Source;
 		}
 
-		(*temp)[Idx2DTo1D(x,y)] = Temp;
+		(*temp)[Idx2DTo1D(x, y)] = Temp;
 	}
 
 	ClickOriginMouseX = MouseX;
 	ClickOriginMouseY = MouseY;
-
-	return;
 }
+
 
 /*
 -------------------------------------------------------------------------------
@@ -537,8 +542,8 @@ static void IdleFunc()
 	for (int i = 0; i < TotalGridCells; ++i)
 	{
 		double tot_den = (*DensityFieldRed)[i]
-					   + (*DensityFieldGreen)[i]
-					   + (*DensityFieldBlue)[i];
+			+ (*DensityFieldGreen)[i]
+			+ (*DensityFieldBlue)[i];
 		double T = (*TemperatureField)[i];
 		(*AccelerationField)[i] += Vec2(0, -(alpha * tot_den) + (beta * T));
 	}
@@ -582,9 +587,9 @@ static void DisplayFunc()
 }
 
 
-/**
+/****************************************************************************
  * Open a glut compatible window and set callbacks
- **/
+ ****************************************************************************/
 static void OpenGlutWindow()
 {
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
@@ -611,7 +616,6 @@ static void OpenGlutWindow()
 	glutIdleFunc(IdleFunc);
 	glutDisplayFunc(DisplayFunc);
 }
-
 
 int main(int argc, char **argv)
 {

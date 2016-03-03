@@ -9,11 +9,6 @@ VectorField.cpp : Implementation of the vector field class.
 #include "VectorField.hpp"
 
 
-// Macros for looping and indexing into the grid
-#define ITER_DIM    for(int i = 1; i < m_GridSize - 1; i++){     \
-						for(int j = 1; j < m_GridSize - 1; j++){
-#define ENDITER_DIM }}
-
 #define VORT_SCALE 0.00001
 
 // Flags for bilinear interpolation
@@ -44,43 +39,51 @@ void VectorField::Advection(const VectorField &oldField)
 	// Temporary field
 	Vec2 *newField = new Vec2[m_TotalNumCells];
 
-	ITER_DIM
-		// Determine the velocity at the grid centers
-		curPos = Vec2(i - 0.5, j - 0.5);
-		vel = oldField.Interpolate(curPos);
-
-		// Backtrack with the interpolated velocity
-		prevPos = curPos - (vel * m_Dt);
-
-		// Apply clipping at boundary if necessary
-		ClipPos(prevPos, curPos, vel, m_GridSize);
-
-		// Find the new grid centered velocities based on the previous position
-		newField[Idx2DTo1D(i, j)] = oldField.Interpolate(prevPos);
-	ENDITER_DIM
-
-	ITER_DIM
-		// Interpolate the new grid centered velocities to the grid edges
-		if (i == 1)
+	for(int j = 1; j < m_GridSize - 1; j++)
+	{
+		for(int i = 1; i < m_GridSize - 1; i++)
 		{
-			m_Field[Idx2DTo1D(i, j)][0] = 0;
-		}
-		else
-		{
-			m_Field[Idx2DTo1D(i, j)][0] = 0.5 * (newField[Idx2DTo1D(i, j)][0]
-										+ newField[Idx2DTo1D(i - 1, j)][0]);
-		}
+			// Determine the velocity at the grid centers
+			curPos = Vec2(i - 0.5, j - 0.5);
+			vel = oldField.Interpolate(curPos);
 
-		if (j == 1)
-		{
-			m_Field[Idx2DTo1D(i, j)][1] = 0;
+			// Backtrack with the interpolated velocity
+			prevPos = curPos - (vel * m_Dt);
+
+			// Apply clipping at boundary if necessary
+			ClipPos(prevPos, curPos, vel, m_GridSize);
+
+			// Find the new grid centered velocities based on the previous position
+			newField[Idx2DTo1D(i, j)] = oldField.Interpolate(prevPos);
 		}
-		else
+	}
+
+	for(int j = 1; j < m_GridSize - 1; j++)
+	{
+		for(int i = 1; i < m_GridSize - 1; i++)
 		{
-			m_Field[Idx2DTo1D(i, j)][1] = 0.5 * (newField[Idx2DTo1D(i, j)][1]
-										+ newField[Idx2DTo1D(i, j - 1)][1]);
+			// Interpolate the new grid centered velocities to the grid edges
+			if (i == 1)
+			{
+				m_Field[Idx2DTo1D(i, j)][0] = 0;
+			}
+			else
+			{
+				m_Field[Idx2DTo1D(i, j)][0] = 0.5 * (newField[Idx2DTo1D(i, j)][0]
+											+ newField[Idx2DTo1D(i - 1, j)][0]);
+			}
+
+			if (j == 1)
+			{
+				m_Field[Idx2DTo1D(i, j)][1] = 0;
+			}
+			else
+			{
+				m_Field[Idx2DTo1D(i, j)][1] = 0.5 * (newField[Idx2DTo1D(i, j)][1]
+											+ newField[Idx2DTo1D(i, j - 1)][1]);
+			}
 		}
-	ENDITER_DIM
+	}
 
 	delete[] newField;
 }
@@ -95,122 +98,146 @@ void VectorField::VorticityConfinement()
 	Vec2 *forces = new Vec2[m_TotalNumCells]();
 
 	// Calculate the magnitude of the curl of v at grid centers
-	ITER_DIM
-		double bottom, right, top, left;
+	for(int j = 1; j < m_GridSize - 1; j++)
+	{
+		for(int i = 1; i < m_GridSize - 1; i++)
+		{
+			double bottom, right, top, left;
 
-		// Check for boundaries
-		if (i == 1)
-		{
-			left = Interpolate(Vec2(i - 0.5, j - 0.5))[1];
-		}
-		else
-		{
-			left = Interpolate(Vec2(i - 1.5, j - 0.5))[1];
-		}
+			// Check for boundaries
+			if (i == 1)
+			{
+				left = Interpolate(Vec2(i - 0.5, j - 0.5))[1];
+			}
+			else
+			{
+				left = Interpolate(Vec2(i - 1.5, j - 0.5))[1];
+			}
 
-		if (i == m_GridSize - 2)
-		{
-			right = Interpolate(Vec2(i - 0.5, j - 0.5))[1];
-		}
-		else
-		{
-			right = Interpolate(Vec2(i + 0.5, j - 0.5))[1];
-		}
+			if (i == m_GridSize - 2)
+			{
+				right = Interpolate(Vec2(i - 0.5, j - 0.5))[1];
+			}
+			else
+			{
+				right = Interpolate(Vec2(i + 0.5, j - 0.5))[1];
+			}
 
-		if (j == 1)
-		{
-			bottom = Interpolate(Vec2(i - 0.5, j - 0.5))[0];
-		}
-		else
-		{
-			bottom = Interpolate(Vec2(i - 0.5, j - 1.5))[0];
-		}
+			if (j == 1)
+			{
+				bottom = Interpolate(Vec2(i - 0.5, j - 0.5))[0];
+			}
+			else
+			{
+				bottom = Interpolate(Vec2(i - 0.5, j - 1.5))[0];
+			}
 
-		if (j == m_GridSize - 2)
-		{
-			top = Interpolate(Vec2(i - 0.5, j - 0.5))[0];
-		}
-		else
-		{
-			top = Interpolate(Vec2(i - 0.5, j + 0.5))[0];
-		}
+			if (j == m_GridSize - 2)
+			{
+				top = Interpolate(Vec2(i - 0.5, j - 0.5))[0];
+			}
+			else
+			{
+				top = Interpolate(Vec2(i - 0.5, j + 0.5))[0];
+			}
 
-		curl[Idx2DTo1D(i, j)] = (right - left - top + bottom) / 2;
-	ENDITER_DIM
+			curl[Idx2DTo1D(i, j)] = (right - left - top + bottom) / 2;
+		}
+	}
 
 	Vec2 grad_w;
 	// Calculate the normalized gradient of the curls on the faces
-	ITER_DIM
-		// Check for boundaries
-		if (i == 1)
+	for(int j = 1; j < m_GridSize - 1; j++)
+	{
+		for(int i = 1; i < m_GridSize - 1; i++)
 		{
-			if (j == 1)
+			// Check for boundaries
+			if (i == 1)
 			{
-				grad_w = Vec2(0, 0);
+				if (j == 1)
+				{
+					grad_w = Vec2(0, 0);
+				}
+				else
+				{
+					grad_w = Vec2(0, curl[Idx2DTo1D(i, j)] - curl[Idx2DTo1D(i, j - 1)]);
+				}
+			}
+			else if (j == 1)
+			{
+				grad_w = Vec2(curl[Idx2DTo1D(i, j)] - curl[Idx2DTo1D(i - 1, j)], 0);
 			}
 			else
 			{
-				grad_w = Vec2(0, curl[Idx2DTo1D(i, j)] - curl[Idx2DTo1D(i, j - 1)]);
+				grad_w = Vec2(curl[Idx2DTo1D(i, j)] - curl[Idx2DTo1D(i - 1, j)],
+							  curl[Idx2DTo1D(i, j)] - curl[Idx2DTo1D(i, j - 1)]);
+			}
+
+			if (norm(grad_w) > EPSILON)
+			{
+				gradCurl[Idx2DTo1D(i, j)] = grad_w / norm(grad_w);
+			}
+			else
+			{
+				gradCurl[Idx2DTo1D(i, j)] = Vec2(0, 0);
 			}
 		}
-		else if (j == 1)
-		{
-			grad_w = Vec2(curl[Idx2DTo1D(i, j)] - curl[Idx2DTo1D(i - 1, j)], 0);
-		}
-		else
-		{
-			grad_w = Vec2(curl[Idx2DTo1D(i, j)] - curl[Idx2DTo1D(i - 1, j)],
-						  curl[Idx2DTo1D(i, j)] - curl[Idx2DTo1D(i, j - 1)]);
-		}
-
-		if (norm(grad_w) > EPSILON)
-		{
-			gradCurl[Idx2DTo1D(i, j)] = grad_w / norm(grad_w);
-		}
-		else
-		{
-			gradCurl[Idx2DTo1D(i, j)] = Vec2(0, 0);
-		}
-	ENDITER_DIM
+	}
 
 	// Average the normals to the grid centers
-	ITER_DIM
-		gradCurl[Idx2DTo1D(i, j)] = Vec2(0.5 * (gradCurl[Idx2DTo1D(i, j)][0] + gradCurl[Idx2DTo1D(i + 1, j)][0]),
-										 0.5 * (gradCurl[Idx2DTo1D(i, j)][1] + gradCurl[Idx2DTo1D(i, j + 1)][1]));
-	ENDITER_DIM
+	for(int j = 1; j < m_GridSize - 1; j++)
+	{
+		for(int i = 1; i < m_GridSize - 1; i++)
+		{
+			double gradCurlX = 0.5 * (gradCurl[Idx2DTo1D(i, j)][0]
+									  + gradCurl[Idx2DTo1D(i + 1, j)][0]);
+			double gradCurlY = 0.5 * (gradCurl[Idx2DTo1D(i, j)][1]
+									  + gradCurl[Idx2DTo1D(i, j + 1)][1]);
+			gradCurl[Idx2DTo1D(i, j)] = Vec2(gradCurlX, gradCurlY);
+		}
+	}
 
 	// Compute the needed forces at the centers of each cell
-	ITER_DIM
-		forces[Idx2DTo1D(i, j)] = VORT_SCALE * Vec2(gradCurl[Idx2DTo1D(i, j)][1] * curl[Idx2DTo1D(i, j)],
-													-gradCurl[Idx2DTo1D(i, j)][0] * curl[Idx2DTo1D(i, j)]);
-	ENDITER_DIM
+	for(int j = 1; j < m_GridSize - 1; j++)
+	{
+		for(int i = 1; i < m_GridSize - 1; i++)
+		{
+			double forceX = gradCurl[Idx2DTo1D(i, j)][1] * curl[Idx2DTo1D(i, j)];
+			double forceY = -gradCurl[Idx2DTo1D(i, j)][0] * curl[Idx2DTo1D(i, j)];
+			forces[Idx2DTo1D(i, j)] = VORT_SCALE * Vec2(forceX, forceY);
+		}
+	}
 
 	// Average the forces to the faces of each cell
-	ITER_DIM
-		if (i == 1)
+	for(int j = 1; j < m_GridSize - 1; j++)
+	{
+		for(int i = 1; i < m_GridSize - 1; i++)
 		{
-			if (j == 1)
+			if (i == 1)
 			{
-				forces[Idx2DTo1D(i, j)] = Vec2(0, 0);
+				if (j == 1)
+				{
+					forces[Idx2DTo1D(i, j)] = Vec2(0, 0);
+				}
+				else
+				{
+					double forceY = 0.5 * (forces[Idx2DTo1D(i, j)][1] + forces[Idx2DTo1D(i, j - 1)][1]);
+					forces[Idx2DTo1D(i, j)] = Vec2(0, forceY);
+				}
+			}
+			else if (j == 1)
+			{
+				double forceX = 0.5 * (forces[Idx2DTo1D(i, j)][0] + forces[Idx2DTo1D(i - 1, j)][0]);
+				forces[Idx2DTo1D(i, j)] = Vec2(forceX, 0);
 			}
 			else
 			{
+				double forceX = 0.5 * (forces[Idx2DTo1D(i, j)][0] + forces[Idx2DTo1D(i - 1, j)][0]);
 				double forceY = 0.5 * (forces[Idx2DTo1D(i, j)][1] + forces[Idx2DTo1D(i, j - 1)][1]);
-				forces[Idx2DTo1D(i, j)] = Vec2(0, forceY);
+				forces[Idx2DTo1D(i, j)] = Vec2(forceX, forceY);
 			}
 		}
-		else if (j == 1)
-		{
-			double forceX = 0.5 * (forces[Idx2DTo1D(i, j)][0] + forces[Idx2DTo1D(i - 1, j)][0]);
-			forces[Idx2DTo1D(i, j)] = Vec2(forceX, 0);
-		}
-		else
-		{
-			double forceX = 0.5 * (forces[Idx2DTo1D(i, j)][0] + forces[Idx2DTo1D(i - 1, j)][0]);
-			double forceY = 0.5 * (forces[Idx2DTo1D(i, j)][1] + forces[Idx2DTo1D(i, j - 1)][1]);
-			forces[Idx2DTo1D(i, j)] = Vec2(forceX, forceY);
-		}
-	ENDITER_DIM
+	}
 
 	// Apply forces to the field
 	AddVectorField(forces);
@@ -226,12 +253,16 @@ void VectorField::Projection()
 	double *divergence = new double[m_TotalNumCells]();
 
 	// Calculate the divergence of the current velocity field
-	ITER_DIM
-		divergence[Idx2DTo1D(i, j)] = m_Field[Idx2DTo1D(i + 1, j)][0]
-									- m_Field[Idx2DTo1D(i, j)][0]
-									+ m_Field[Idx2DTo1D(i, j + 1)][1]
-									- m_Field[Idx2DTo1D(i, j)][1];
-	ENDITER_DIM
+	for(int j = 1; j < m_GridSize - 1; j++)
+	{
+		for(int i = 1; i < m_GridSize - 1; i++)
+		{
+			divergence[Idx2DTo1D(i, j)] = m_Field[Idx2DTo1D(i + 1, j)][0]
+										- m_Field[Idx2DTo1D(i, j)][0]
+										+ m_Field[Idx2DTo1D(i, j + 1)][1]
+										- m_Field[Idx2DTo1D(i, j)][1];
+		}
+	}
 
 	// Initialize Laplacian matrix
 	ImplicitMatrixLap laplacian(m_GridSize);
@@ -251,41 +282,45 @@ void VectorField::Projection()
 	}
 
 	// Calculate the new velocity field as v - grad(p)
-	ITER_DIM
-		// Checks for boundaries
-		if (i == 1)
+	for(int j = 1; j < m_GridSize - 1; j++)
+	{
+		for(int i = 1; i < m_GridSize - 1; i++)
 		{
-			if (j == 1)
+			// Checks for boundaries
+			if (i == 1)
 			{
-				m_Field[Idx2DTo1D(i, j)] = Vec2(0, 0);
+				if (j == 1)
+				{
+					m_Field[Idx2DTo1D(i, j)] = Vec2(0, 0);
+				}
+				else
+				{
+					double yPressureDelta = pressure[Idx2DTo1D(i, j)]
+										  - pressure[Idx2DTo1D(i, j - 1)];
+					m_Field[Idx2DTo1D(i, j)] = m_Field[Idx2DTo1D(i, j)]
+											 - Vec2(0, yPressureDelta);
+				}
 			}
 			else
 			{
-				double yPressureDelta = pressure[Idx2DTo1D(i, j)]
-									  - pressure[Idx2DTo1D(i, j - 1)];
-				m_Field[Idx2DTo1D(i, j)] = m_Field[Idx2DTo1D(i, j)]
-										 - Vec2(0, yPressureDelta);
+				if (j == 1)
+				{
+					m_Field[Idx2DTo1D(i, j)] = m_Field[Idx2DTo1D(i, j)]
+											 - Vec2(pressure[Idx2DTo1D(i, j)]
+											 - pressure[Idx2DTo1D(i - 1, j)], 0);
+				}
+				else
+				{
+					double xPressureDelta = pressure[Idx2DTo1D(i, j)]
+										  - pressure[Idx2DTo1D(i - 1, j)];
+					double yPressureDelta = pressure[Idx2DTo1D(i, j)]
+										  - pressure[Idx2DTo1D(i, j - 1)];
+					m_Field[Idx2DTo1D(i, j)] = m_Field[Idx2DTo1D(i, j)]
+											 - Vec2(xPressureDelta, yPressureDelta);
+				}
 			}
 		}
-		else
-		{
-			if (j == 1)
-			{
-				m_Field[Idx2DTo1D(i, j)] = m_Field[Idx2DTo1D(i, j)]
-										 - Vec2(pressure[Idx2DTo1D(i, j)]
-										 - pressure[Idx2DTo1D(i - 1, j)], 0);
-			}
-			else
-			{
-				double xPressureDelta = pressure[Idx2DTo1D(i, j)]
-									  - pressure[Idx2DTo1D(i - 1, j)];
-				double yPressureDelta = pressure[Idx2DTo1D(i, j)]
-									  - pressure[Idx2DTo1D(i, j - 1)];
-				m_Field[Idx2DTo1D(i, j)] = m_Field[Idx2DTo1D(i, j)]
-										 - Vec2(xPressureDelta, yPressureDelta);
-			}
-		}
-	ENDITER_DIM
+	}
 
 	delete[] pressure;
 	delete[] divergence;
