@@ -270,7 +270,7 @@ static void PostDisplay()
 			const unsigned int w = glutGet(GLUT_WINDOW_WIDTH);
 			const unsigned int h = glutGet(GLUT_WINDOW_HEIGHT);
 			
-			unsigned char * buffer = new char[w * h * 4];
+			unsigned char * buffer = new unsigned char[w * h * 4];
 			glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
 			char filename[13];
